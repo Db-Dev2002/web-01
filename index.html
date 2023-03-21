@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Music UI</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <button>Import Song</button>
+    </header>
+
+    <main>
+      <aside class="lat"></aside>
+      <aside class="equ">
+        <div class="equalizer"></div>
+      </aside>
+      <section class="content">
+        <div class="music-wave"></div>
+        <div class="blank-space"></div>
+        <div class="piano">
+          <div class="white-keys">
+            <div class="white-key piano-key" data-note="C"></div>
+            <div class="white-key piano-key" data-note="D"></div>
+            <div class="white-key piano-key" data-note="E"></div>
+            <div class="white-key piano-key" data-note="F"></div>
+            <div class="white-key piano-key" data-note="G"></div>
+            <div class="white-key piano-key" data-note="A"></div>
+            <div class="white-key piano-key" data-note="B"></div>
+          </div>
+          <div class="black-keys">
+            <div class="black-key piano-key" data-note="C#"></div>
+            <div class="black-key piano-key" data-note="D#"></div>
+            <div class="black-key piano-key" data-note="F#"></div>
+            <div class="black-key piano-key" data-note="G#"></div>
+            <div class="black-key piano-key" data-note="A#"></div>
+          </div>
+        </div>
+
+        <div class="blank-space"></div>
+      </section>
+      <aside class="right-blank"></aside>
+    </main>
+
+    <footer>
+      <div class="controls">
+        <button>&#9668;</button>
+        <button>&#9658;</button>
+        <button>&#9658;&#9658;</button>
+      </div>
+      <div class="played-time">00:00</div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
