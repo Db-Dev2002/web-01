@@ -1,22 +1,45 @@
 const notes = {
-  "C": new Howl({ src: ["path/to/C-note.wav"] }),
-  "C#": new Howl({ src: ["path/to/C-sharp-note.wav"] }),
-  "D": new Howl({ src: ["path/to/D-note.wav"] }),
-  "D#": new Howl({ src: ["path/to/D-sharp-note.wav"] }),
-  "E": new Howl({ src: ["path/to/E-note.wav"] }),
-  "F": new Howl({ src: ["path/to/F-note.wav"] }),
-  "F#": new Howl({ src: ["path/to/F-sharp-note.wav"] }),
-  "G": new Howl({ src: ["path/to/G-note.wav"] }),
-  "G#": new Howl({ src: ["path/to/G-sharp-note.wav"] }),
-  "A": new Howl({ src: ["path/to/A-note.wav"] }),
-  "A#": new Howl({ src: ["path/to/A-sharp-note.wav"] }),
-  "B": new Howl({ src: ["path/to/B-note.wav"] }),
+    C0: new Howl({ src: ["notes/1.wav"] }),
+    "C0#": new Howl({ src: ["notes/2.wav"] }),
+    D0: new Howl({ src: ["notes/3.wav"] }),
+    "D0#": new Howl({ src: ["notes/4.wav"] }),
+    E0: new Howl({ src: ["notes/5.wav"] }),
+    F0: new Howl({ src: ["notes/6.wav"] }),
+    "F0#": new Howl({ src: ["notes/7.wav"] }),
+    G0: new Howl({ src: ["notes/8.wav"] }),
+    "G0#": new Howl({ src: ["notes/9.wav"] }),
+    A0: new Howl({ src: ["notes/10.wav"] }),
+    "A0#": new Howl({ src: ["notes/11.wav"] }),
+    B0: new Howl({ src: ["notes/12.wav"] }),
+    C1: new Howl({ src: ["notes/13.wav"] }),
+    "C1#": new Howl({ src: ["notes/14.wav"] }),
+    D1: new Howl({ src: ["notes/15.wav"] }),
+    "D1#": new Howl({ src: ["notes/16.wav"] }),
+    E1: new Howl({ src: ["notes/17.wav"] }),
+    F1: new Howl({ src: ["notes/18.wav"] }),
+    "F1#": new Howl({ src: ["notes/19.wav"] }),
+    G1: new Howl({ src: ["notes/20.wav"] }),
+    "G1#": new Howl({ src: ["notes/21.wav"] }),
+    A1: new Howl({ src: ["notes/22.wav"] }),
+    "A1#": new Howl({ src: ["notes/23.wav"] }),
+    B1: new Howl({ src: ["notes/24.wav"] }),
+    C2: new Howl({ src: ["notes/25.wav"] }),
+    "C2#": new Howl({ src: ["notes/26.wav"] }),
+    D2: new Howl({ src: ["notes/27.wav"] }),
+    "D2#": new Howl({ src: ["notes/28.wav"] }),
+    E2: new Howl({ src: ["notes/29.wav"] }),
+    F2: new Howl({ src: ["notes/30.wav"] }),
+    "F2#": new Howl({ src: ["notes/31.wav"] }),
+    G2: new Howl({ src: ["notes/32.wav"] }),
+    "G2#": new Howl({ src: ["notes/33.wav"] }),
+    A2: new Howl({ src: ["notes/34.wav"] }),
+    "A2#": new Howl({ src: ["notes/35.wav"] }),
+    B2: new Howl({ src: ["notes/36.wav"] }),
 };
 
 document.querySelectorAll(".pianoBlackKey, .pianoWhiteKey").forEach((key) => {
-  key.addEventListener("mousedown", (e) => {
-    const note = e.target.dataset.note;
-    notes[note].play();
-  });
+    key.addEventListener("mousedown", (e) => {
+        const note = e.target.dataset.note;
+        notes[note].play();
+    });
 });
-
