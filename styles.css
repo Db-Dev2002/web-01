@@ -1,111 +1,178 @@
 @import "./variables.css";
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  display: flex;
-  flex-direction: column;
   min-height: 100vh;
+  background-color: var(--color-gray-22);
 }
 
 header {
-  background-color: var(--color-gray-24);
-  padding: 1rem;
-}
-
-main {
-  flex-grow: 1;
-  display: grid;
-  grid-template-columns: 0.5fr 1fr 3fr 0.5fr;
-  grid-template-areas: "lat equ content right-blank";
-}
-
-.lat,
-.equ,
-.right-blank {
-  background-color: var(--color-gray-24);
-  padding: 1rem;
-}
-
-.equ {
-  background-color: var(--color-gray-32);
+  height: 4vh;
+  background-color: var(--color-gray-12);
   display: flex;
-  justify-content: center;
-}
-
-.equalizer {
-  /* Add your equalizer styles here */
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.music-wave,
-.piano {
-  height: 80px;
-  background-color: var(--color-gray-20);
-  margin: 1rem;
-  width: 100px;
-}
-
-.blank-space {
-  flex-grow: 1;
+  flex-direction: row;
 }
 
 footer {
+  height: 4vh;
+  background-color: var(--color-gray-12);
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
   align-items: center;
-  background-color: var(--color-gray-24);
-  padding: 1rem;
+  justify-content: center;
 }
 
-footer .controls button {
-  font-size: 1.5rem;
-  margin-right: 1rem;
+.contentContainer {
+  display: flex;
+  flex-direction: row;
+  min-height: 92vh;
 }
 
-.piano {
-  height: 300px;
-  width: 100%;
-  background-color: var(--color-gray-20);
-  margin: 1rem;
-  position: relative;
+button {
+  margin: 0;
+  color: var(--gray-gray-22);
+  background-color: var(--color-orange);
+  border-radius: 20px;
+  border-color: var(--color-orange);
+  padding: 6px 6px 6px 6px;
+}
+
+.lat {
+  background-color: var(--color-gray-03);
+  width: 2vw;
+  height: auto;
+  min-height: 80vh;
+}
+
+.equ {
+  background-color: var(--color-gray-18);
+  width: 13vw;
+  height: auto;
+  min-height: 80vh;
+}
+
+.equ {
+  background-color: var(--color-gray-18);
+  width: 13vw;
+  height: auto;
+  min-height: 80vh;
+}
+
+.middleContainer {
+  flex: 1;
+  display: flex;
+  background-color: var(--color-gray-14);
+  flex-direction: column;
+  min-height: 92vh;
+  /* width: 80vw; */
+}
+
+.middleBlankSpace {
+  min-height: 2vh;
+  background-color: var(--color-gray-03);
+}
+
+.middleTopContainer {
+  display: flex;
+  background-color: var(--color-gray-10);
+  flex-direction: row;
+  min-height: 34vh;
+}
+
+.middleTopLeft {
+  background-color: var(--color-gray-06);
+  flex-basis: 16%;
+}
+
+.middleTopWave {
+  flex: 1;
+  display: flex;
+  background-color: var(--color-gray-28);
+}
+
+.middleMidContainer {
+  display: flex;
+  background-color: var(--color-gray-10);
+  flex-direction: row;
+  min-height: 54vh;
+}
+
+.middlePianoContainer {
   display: flex;
   flex-direction: column;
+  background-color: var(--color-gray-32);
+  flex-basis: 13%;
+  position: relative;
+  height: 100%;
 }
 
-.white-keys,
-.black-keys {
+.pianoWhiteKey {
+  background-color: var(--color-gray-32);
+  flex: 1;
+  border-color: var(--color-gray-01);
+  border-top: 1px solid;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+  border-left: none;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.pianoWhiteKey:hover {
+  background-color: var(--color-gray-28);
+}
+
+.pianoBlackKeyContainer {
   display: flex;
   flex-direction: column;
   position: absolute;
-  width: 100%;
-}
-
-.white-key {
-  height: calc(100% / 7);
-  background-color: #fff;
-  border: 1px solid var(--color-gray-24);
-  box-sizing: border-box;
-  width: 100%;
-}
-
-.black-keys {
+  height: 100%;
   z-index: 1;
-  margin-left: 60%;
-  width: 40%;
+  width: 60%;
 }
 
-.black-key {
-  height: calc(100% / 7 * 0.6);
-  background-color: #000;
-  margin-bottom: calc(100% / 7 * 0.4);
+.pianoBlackKey {
+  margin-top: 4%;
+  margin-bottom: 4%;
+  background-color: var(--color-gray-01);
+  width: 100%;
+  height: 100%;
+  border-color: var(--color-gray-32);
+  border-top: 1px solid;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+  border-left: none;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
 }
 
-.black-key:last-child {
-  display: none;
+.pianoBlackKey:hover {
+  background-color: var(--color-gray-08);
+}
+
+.pianoBlackKey--spacer {
+  height: 100%;
+  background-color: transparent;
+}
+
+.pianoBlackKey:first-child {
+  margin-top: 10%;
+}
+
+.pianoBlackKey:last-child {
+  margin-bottom: 10%;
+}
+
+.middleMain {
+  flex: 1;
+  display: flex;
+  background-color: var(--color-gray-28);
+}
+
+.right {
+  background-color: var(--color-gray-06);
+  width: 3vw;
+  height: auto;
+  min-height: 80vh;
 }

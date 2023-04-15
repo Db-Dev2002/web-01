@@ -6,42 +6,77 @@
     <title>Music UI</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
+
   <body>
     <header>
       <button>Import Song</button>
     </header>
 
-    <main>
+    <div class="contentContainer">
       <aside class="lat"></aside>
-      <aside class="equ">
-        <div class="equalizer"></div>
-      </aside>
-      <section class="content">
-        <div class="music-wave"></div>
-        <div class="blank-space"></div>
-        <div class="piano">
-          <div class="white-keys">
-            <div class="white-key piano-key" data-note="C"></div>
-            <div class="white-key piano-key" data-note="D"></div>
-            <div class="white-key piano-key" data-note="E"></div>
-            <div class="white-key piano-key" data-note="F"></div>
-            <div class="white-key piano-key" data-note="G"></div>
-            <div class="white-key piano-key" data-note="A"></div>
-            <div class="white-key piano-key" data-note="B"></div>
-          </div>
-          <div class="black-keys">
-            <div class="black-key piano-key" data-note="C#"></div>
-            <div class="black-key piano-key" data-note="D#"></div>
-            <div class="black-key piano-key" data-note="F#"></div>
-            <div class="black-key piano-key" data-note="G#"></div>
-            <div class="black-key piano-key" data-note="A#"></div>
-          </div>
+      <div class="equ"></div>
+      <div class="middleContainer">
+        <div class="middleTopContainer">
+          <div class="middleTopLeft"></div>
+          <div class="middleTopWave"></div>
         </div>
 
-        <div class="blank-space"></div>
-      </section>
-      <aside class="right-blank"></aside>
-    </main>
+        <div class="middleBlankSpace"></div>
+
+        <div class="middleMidContainer">
+          <div class="middlePianoContainer">
+            <div class="pianoBlackKeyContainer">
+              <div class="pianoBlackKey"></div>
+              <div class="pianoBlackKey"></div>
+              <div class="pianoBlackKey--spacer"></div>
+              <div class="pianoBlackKey"></div>
+              <div class="pianoBlackKey"></div>
+              <div class="pianoBlackKey"></div>
+              <div class="pianoBlackKey--spacer"></div>
+              <div class="pianoBlackKey"></div>
+              <div class="pianoBlackKey"></div>
+              <div class="pianoBlackKey--spacer"></div>
+              <div class="pianoBlackKey"></div>
+              <div class="pianoBlackKey"></div>
+              <div class="pianoBlackKey"></div>
+              <div class="pianoBlackKey--spacer"></div>
+              <div class="pianoBlackKey"></div>
+              <div class="pianoBlackKey"></div>
+              <div class="pianoBlackKey--spacer"></div>
+              <div class="pianoBlackKey"></div>
+              <div class="pianoBlackKey"></div>
+              <div class="pianoBlackKey"></div>
+            </div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+            <div class="pianoWhiteKey"></div>
+          </div>
+          <div class="middleMain"></div>
+        </div>
+
+        <div class="middleBlankSpace"></div>
+      </div>
+
+      <aside class="right"></aside>
+    </div>
 
     <footer>
       <div class="controls">
