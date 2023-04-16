@@ -26,44 +26,51 @@ document.querySelectorAll(".pianoBlackKey, .pianoWhiteKey").forEach((key) => {
 const analyser = audioContext.createAnalyser();
 gainNode.connect(analyser);
 
-analyser.fftSize = 4096;
+analyser.fftSize = 1024;
 const bufferLength = analyser.frequencyBinCount;
 const dataArray = new Uint8Array(bufferLength);
 
-analyser.getByteTimeDomainData(dataArray);
-
-const canvas = document.getElementById("canvas");
+const canvas = document.getElementById("equalizer-canvas");
 const canvasCtx = canvas.getContext("2d");
+
+function resizeCanvas() {
+    canvas.width = canvas.parentElement.offsetWidth;
+    canvas.height = canvas.parentElement.offsetHeight;
+}
+
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 
+canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+
 function draw() {
-    requestAnimationFrame(draw);
-    analyser.getByteTimeDomainData(dataArray);
-    canvasCtx.fillStyle = "rgb(200, 200, 200)";
+    drawVisual = requestAnimationFrame(draw);
+
+    analyser.getByteFrequencyData(dataArray);
+
+    canvasCtx.fillStyle = "rgb(0, 0, 0)";
     canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
-    canvasCtx.lineWidth = 2;
-    canvasCtx.strokeStyle = "rgb(0, 0, 200)";
-    canvasCtx.beginPath();
 
-    const sliceWidth = canvas.width / bufferLength;
+    const totalBars = 512;
+    const barHeight = HEIGHT / totalBars;
+    let barWidth;
+    let y = 0;
 
-    let x = 0;
+    for (let i = 0; i < totalBars; i++) {
+        const bufferIndex = Math.floor((i * bufferLength) / totalBars);
+        barWidth = dataArray[bufferIndex] * (WIDTH / 256);
 
-    for (let i = 0; i < bufferLength; i++) {
-        const v = dataArray[i] / 128.0;
-        const y = v * (HEIGHT / 2);
+        const r = Math.floor(200 * (1 - i / totalBars));
+        const b = Math.floor(200 * (i / totalBars));
+        const color = `rgb(${r}, 50, ${b})`;
 
-        if (i === 0) {
-            canvasCtx.moveTo(x, y);
-        } else {
-            canvasCtx.lineTo(x, y);
-        }
+        canvasCtx.fillStyle = color;
+        canvasCtx.fillRect(WIDTH - barWidth, y, barWidth, barHeight);
 
-        x += sliceWidth;
+        y += barHeight + 1;
     }
-    canvasCtx.lineTo(WIDTH, HEIGHT / 2);
-    canvasCtx.stroke();
 }
 
 draw();

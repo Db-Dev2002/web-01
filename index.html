@@ -17,12 +17,14 @@
     <div class="contentContainer">
       <aside class="lat"></aside>
       <div class="equ">
-        <canvas id="canvas"></canvas>
+        <canvas id="equalizer-canvas"></canvas>
       </div>
       <div class="middleContainer">
         <div class="middleTopContainer">
           <div class="middleTopLeft"></div>
-          <div class="middleTopWave"></div>
+          <div class="middleTopWave">
+            <canvas id="wave-canvas"></canvas>
+          </div>
         </div>
 
         <div class="middleBlankSpace"></div>
@@ -30,13 +32,6 @@
         <div class="middleMidContainer">
           <div class="middlePianoContainer">
             <div class="pianoBlackKeyContainer">
-              <div class="pianoBlackKey" , data-note="C0#"></div>
-              <div class="pianoBlackKey" , data-note="D0#"></div>
-              <div class="pianoBlackKey--spacer"></div>
-              <div class="pianoBlackKey" , data-note="F0#"></div>
-              <div class="pianoBlackKey" , data-note="G0#"></div>
-              <div class="pianoBlackKey" , data-note="A0#"></div>
-              <div class="pianoBlackKey--spacer"></div>
               <div class="pianoBlackKey" , data-note="C1#"></div>
               <div class="pianoBlackKey" , data-note="D1#"></div>
               <div class="pianoBlackKey--spacer"></div>
@@ -50,14 +45,14 @@
               <div class="pianoBlackKey" , data-note="F2#"></div>
               <div class="pianoBlackKey" , data-note="G2#"></div>
               <div class="pianoBlackKey" , data-note="A2#"></div>
+              <div class="pianoBlackKey--spacer"></div>
+              <div class="pianoBlackKey" , data-note="C3#"></div>
+              <div class="pianoBlackKey" , data-note="D3#"></div>
+              <div class="pianoBlackKey--spacer"></div>
+              <div class="pianoBlackKey" , data-note="F3#"></div>
+              <div class="pianoBlackKey" , data-note="G3#"></div>
+              <div class="pianoBlackKey" , data-note="A3#"></div>
             </div>
-            <div class="pianoWhiteKey" , data-note="C0"></div>
-            <div class="pianoWhiteKey" , data-note="D0"></div>
-            <div class="pianoWhiteKey" , data-note="E0"></div>
-            <div class="pianoWhiteKey" , data-note="F0"></div>
-            <div class="pianoWhiteKey" , data-note="G0"></div>
-            <div class="pianoWhiteKey" , data-note="A0"></div>
-            <div class="pianoWhiteKey" , data-note="B0"></div>
             <div class="pianoWhiteKey" , data-note="C1"></div>
             <div class="pianoWhiteKey" , data-note="D1"></div>
             <div class="pianoWhiteKey" , data-note="E1"></div>
@@ -72,6 +67,13 @@
             <div class="pianoWhiteKey" , data-note="G2"></div>
             <div class="pianoWhiteKey" , data-note="A2"></div>
             <div class="pianoWhiteKey" , data-note="B2"></div>
+            <div class="pianoWhiteKey" , data-note="C3"></div>
+            <div class="pianoWhiteKey" , data-note="D3"></div>
+            <div class="pianoWhiteKey" , data-note="E3"></div>
+            <div class="pianoWhiteKey" , data-note="F3"></div>
+            <div class="pianoWhiteKey" , data-note="G3"></div>
+            <div class="pianoWhiteKey" , data-note="A3"></div>
+            <div class="pianoWhiteKey" , data-note="B3"></div>
           </div>
           <div class="middleMain"></div>
         </div>
