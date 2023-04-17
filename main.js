@@ -22,19 +22,30 @@ const loadBuffer = async (url) => {
     return buffer;
 };
 
-// const playNote = async (note) => {
-//     const player = new Tone.Player(`notes/${note}.wav`).toDestination();
-//     await player.load();
-//     player.start();
-// };
-
 const playNote = async (note) => {
+    if (!note) {
+        console.warn("Invalid note name:", note);
+        return;
+    }
     const buffer = await loadBuffer(`notes/${note}.wav`);
     const source = audioContext.createBufferSource();
     source.buffer = buffer;
     source.connect(gainNode);
     source.start();
 };
+
+// const playNote = async (note) => {
+//     if (!note) {
+//         console.warn("Invalid note name:", note);
+//         return;
+//     }
+//
+//     const url = `notes/${note}.wav`;
+//     console.log(`Play note: ${note}, URL: ${url}`);
+//     const player = new Tone.Player(url).toDestination();
+//     await player.load();
+//     player.start();
+// };
 
 document.querySelectorAll(".pianoBlackKey, .pianoWhiteKey").forEach((key) => {
     key.addEventListener("mousedown", async (e) => {
@@ -119,6 +130,7 @@ const midiNoteToNoteName = (midiNote) => {
     if (octave >= 1 && octave <= 7) {
         return noteName + octave;
     } else {
+        console.log(`Invalid MIDI note: ${midiNote}`);
         return null;
     }
 };
@@ -140,21 +152,30 @@ const loadAndPlayMIDIFile = async (url) => {
         });
     });
 
-    const noteLoadingPromises = Array.from(noteSet).map((noteName) => loadBuffer(`notes/${noteName}.wav`));
+    const noteLoadingPromises = Array.from(noteSet).map((noteName) =>
+        loadBuffer(`notes/${noteName}.wav`)
+    );
 
     await Promise.all(noteLoadingPromises);
 
     midiFile.tracks.forEach((track) => {
-        const notes = track.notes.map((note) => {
-            const noteName = midiNoteToNoteName(note.midi);
-            return {
-                time: note.time,
-                name: noteName,
-                duration: note.duration,
-            };
-        });
+        const notes = track.notes
+            .map((note) => {
+                const noteName = midiNoteToNoteName(note.midi);
+                return {
+                    time: note.time,
+                    name: noteName,
+                    duration: note.duration,
+                };
+            })
+            .filter((note) => note.name !== null);
 
         const part = new Tone.Part((time, value) => {
+            if (!value.name) {
+                console.warn("Invalid note name:", value.name);
+                return;
+            }
+
             const player = new Tone.Player(`notes/${value.name}.wav`).toDestination();
             player.sync().start(time, 0, value.duration);
         }, notes).start(0);
@@ -162,7 +183,6 @@ const loadAndPlayMIDIFile = async (url) => {
 
     Tone.Transport.start();
 };
-
 
 
 const playMidiButton = document.getElementById("play-midi");
