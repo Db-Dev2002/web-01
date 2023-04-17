@@ -22,10 +22,18 @@ const loadBuffer = async (url) => {
     return buffer;
 };
 
+// const playNote = async (note) => {
+//     const player = new Tone.Player(`notes/${note}.wav`).toDestination();
+//     await player.load();
+//     player.start();
+// };
+
 const playNote = async (note) => {
-    const player = new Tone.Player(`notes/${note}.wav`).toDestination();
-    await player.load();
-    player.start();
+    const buffer = await loadBuffer(`notes/${note}.wav`);
+    const source = audioContext.createBufferSource();
+    source.buffer = buffer;
+    source.connect(gainNode);
+    source.start();
 };
 
 document.querySelectorAll(".pianoBlackKey, .pianoWhiteKey").forEach((key) => {
@@ -120,6 +128,22 @@ const loadAndPlayMIDIFile = async (url) => {
     const midiData = await response.arrayBuffer();
     const midiFile = new Midi(midiData);
 
+    // Adjust playback speed
+    Tone.Transport.bpm.value = midiFile.header.tempos[0].bpm / 2;
+
+    const noteSet = new Set();
+
+    midiFile.tracks.forEach((track) => {
+        track.notes.forEach((note) => {
+            const noteName = midiNoteToNoteName(note.midi);
+            noteSet.add(noteName);
+        });
+    });
+
+    const noteLoadingPromises = Array.from(noteSet).map((noteName) => loadBuffer(`notes/${noteName}.wav`));
+
+    await Promise.all(noteLoadingPromises);
+
     midiFile.tracks.forEach((track) => {
         const notes = track.notes.map((note) => {
             const noteName = midiNoteToNoteName(note.midi);
@@ -139,9 +163,12 @@ const loadAndPlayMIDIFile = async (url) => {
     Tone.Transport.start();
 };
 
+
+
 const playMidiButton = document.getElementById("play-midi");
 
 playMidiButton.addEventListener("click", async () => {
     await Tone.start();
-    loadAndPlayMIDIFile("midi/UNSORTED MIDI/Linkin Park - Crawling.mid");
+    // loadAndPlayMIDIFile("midi/UNSORTED MIDI/Linkin Park - Crawling.mid");
+    loadAndPlayMIDIFile("bella_ciao.mid");
 });
