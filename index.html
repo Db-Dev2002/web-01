@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script> -->
+<!-- <script src="./node_modules/webmidi/dist/esm/webmidi.esm.min.js""></script> -->
 
 <html lang="en">
   <head>
@@ -32,34 +32,34 @@
         <div class="middleMidContainer">
           <div class="middlePianoContainer">
             <div class="pianoBlackKeyContainer">
-              <div class="pianoBlackKey" , data-note="C1#"></div>
-              <div class="pianoBlackKey" , data-note="D1#"></div>
+              <div class="pianoBlackKey" , data-note="Db2"></div>
+              <div class="pianoBlackKey" , data-note="Eb2"></div>
               <div class="pianoBlackKey--spacer"></div>
-              <div class="pianoBlackKey" , data-note="F1#"></div>
-              <div class="pianoBlackKey" , data-note="G1#"></div>
-              <div class="pianoBlackKey" , data-note="A1#"></div>
+              <div class="pianoBlackKey" , data-note="Gb2"></div>
+              <div class="pianoBlackKey" , data-note="Ab2"></div>
+              <div class="pianoBlackKey" , data-note="Bb2"></div>
               <div class="pianoBlackKey--spacer"></div>
-              <div class="pianoBlackKey" , data-note="C2#"></div>
-              <div class="pianoBlackKey" , data-note="D2#"></div>
+              <div class="pianoBlackKey" , data-note="Db3"></div>
+              <div class="pianoBlackKey" , data-note="Eb3"></div>
               <div class="pianoBlackKey--spacer"></div>
-              <div class="pianoBlackKey" , data-note="F2#"></div>
-              <div class="pianoBlackKey" , data-note="G2#"></div>
-              <div class="pianoBlackKey" , data-note="A2#"></div>
+              <div class="pianoBlackKey" , data-note="Gb3"></div>
+              <div class="pianoBlackKey" , data-note="Ab3"></div>
+              <div class="pianoBlackKey" , data-note="Bb3"></div>
               <div class="pianoBlackKey--spacer"></div>
-              <div class="pianoBlackKey" , data-note="C3#"></div>
-              <div class="pianoBlackKey" , data-note="D3#"></div>
+              <div class="pianoBlackKey" , data-note="Db4"></div>
+              <div class="pianoBlackKey" , data-note="Eb4"></div>
               <div class="pianoBlackKey--spacer"></div>
-              <div class="pianoBlackKey" , data-note="F3#"></div>
-              <div class="pianoBlackKey" , data-note="G3#"></div>
-              <div class="pianoBlackKey" , data-note="A3#"></div>
+              <div class="pianoBlackKey" , data-note="Gb4"></div>
+              <div class="pianoBlackKey" , data-note="Ab4"></div>
+              <div class="pianoBlackKey" , data-note="Bb4"></div>
+              <div class="pianoBlackKey--spacer"></div>
+              <div class="pianoBlackKey" , data-note="Db5"></div>
+              <div class="pianoBlackKey" , data-note="Eb5"></div>
+              <div class="pianoBlackKey--spacer"></div>
+              <div class="pianoBlackKey" , data-note="Gb5"></div>
+              <div class="pianoBlackKey" , data-note="Ab5"></div>
+              <div class="pianoBlackKey" , data-note="Bb5"></div>
             </div>
-            <div class="pianoWhiteKey" , data-note="C1"></div>
-            <div class="pianoWhiteKey" , data-note="D1"></div>
-            <div class="pianoWhiteKey" , data-note="E1"></div>
-            <div class="pianoWhiteKey" , data-note="F1"></div>
-            <div class="pianoWhiteKey" , data-note="G1"></div>
-            <div class="pianoWhiteKey" , data-note="A1"></div>
-            <div class="pianoWhiteKey" , data-note="B1"></div>
             <div class="pianoWhiteKey" , data-note="C2"></div>
             <div class="pianoWhiteKey" , data-note="D2"></div>
             <div class="pianoWhiteKey" , data-note="E2"></div>
@@ -74,6 +74,20 @@
             <div class="pianoWhiteKey" , data-note="G3"></div>
             <div class="pianoWhiteKey" , data-note="A3"></div>
             <div class="pianoWhiteKey" , data-note="B3"></div>
+            <div class="pianoWhiteKey" , data-note="C4"></div>
+            <div class="pianoWhiteKey" , data-note="D4"></div>
+            <div class="pianoWhiteKey" , data-note="E4"></div>
+            <div class="pianoWhiteKey" , data-note="F4"></div>
+            <div class="pianoWhiteKey" , data-note="G4"></div>
+            <div class="pianoWhiteKey" , data-note="A4"></div>
+            <div class="pianoWhiteKey" , data-note="B4"></div>
+            <div class="pianoWhiteKey" , data-note="C5"></div>
+            <div class="pianoWhiteKey" , data-note="D5"></div>
+            <div class="pianoWhiteKey" , data-note="E5"></div>
+            <div class="pianoWhiteKey" , data-note="F5"></div>
+            <div class="pianoWhiteKey" , data-note="G5"></div>
+            <div class="pianoWhiteKey" , data-note="A5"></div>
+            <div class="pianoWhiteKey" , data-note="B5"></div>
           </div>
           <div class="middleMain"></div>
         </div>
@@ -90,9 +104,10 @@
         <button>&#9658;</button>
         <button>&#9658;&#9658;</button>
       </div>
+      <button id="play-midi">Play MIDI</button>
       <div class="played-time">00:00</div>
     </footer>
 
-    <script src="app.js"></script>
+    <script src="main.js" type="module"></script>
   </body>
 </html>
