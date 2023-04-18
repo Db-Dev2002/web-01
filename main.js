@@ -22,16 +22,27 @@ const loadBuffer = async (url) => {
     return buffer;
 };
 
+// const playNote = async (note) => {
+//     if (!note) {
+//         console.warn("Invalid note name:", note);
+//         return;
+//     }
+//     const buffer = await loadBuffer(`notes/${note}.wav`);
+//     const source = audioContext.createBufferSource();
+//     source.buffer = buffer;
+//     source.connect(gainNode);
+//     source.start();
+// };
+
 const playNote = async (note) => {
     if (!note) {
         console.warn("Invalid note name:", note);
         return;
     }
-    const buffer = await loadBuffer(`notes/${note}.wav`);
-    const source = audioContext.createBufferSource();
-    source.buffer = buffer;
-    source.connect(gainNode);
-    source.start();
+    const url = `notes/${note}.wav`;
+    const buffer = await loadBuffer(url);
+    const player = new Tone.Player(buffer).toDestination();
+    player.start();
 };
 
 // const playNote = async (note) => {
@@ -135,28 +146,129 @@ const midiNoteToNoteName = (midiNote) => {
     }
 };
 
+const createSampler = async () => {
+    const noteMap = {};
+
+    for (let midiNote = 21; midiNote <= 108; midiNote++) {
+        const noteName = midiNoteToNoteName(midiNote);
+        if (noteName !== null) {
+            noteMap[noteName] = `notes/${noteName}.wav`;
+        }
+    }
+
+    const sampler = new Tone.Sampler(noteMap, {
+        onload: () => console.log("Sampler loaded"),
+        baseUrl: "",
+    }).toDestination();
+
+    return sampler;
+};
+
+const loadPianoSamples = async () => {
+    const noteMap = {};
+
+    for (let midiNote = 21; midiNote <= 108; midiNote++) {
+        const noteName = midiNoteToNoteName(midiNote);
+        if (noteName !== null) {
+            noteMap[noteName] = `notes/${noteName}.wav`; // Make sure you adjust the path to your samples
+        }
+    }
+
+    const polyPiano = new Tone.PolySynth(Tone.Sampler, {
+        onload: () => console.log("Piano loaded"),
+        baseUrl: "",
+        urls: noteMap,
+    }).toDestination();
+
+    return polyPiano;
+};
+
+const polyPiano = await loadPianoSamples();
+
+const test = async () => {
+    // Trigger multiple notes at once
+    polyPiano.triggerAttack(["C4", "E4", "G4"]);
+    setTimeout(() => {
+        polyPiano.triggerRelease(["C4", "E4", "G4"]);
+    }, 1000);
+};
+
+const playButton = document.getElementById("play-midi");
+
+playButton.addEventListener("click", async () => {
+    await Tone.start();
+    // loadAndPlayMIDIFile("midi/UNSORTED MIDI/Linkin Park - Crawling.mid");
+    // loadAndPlayMIDIFile("bella_ciao.mid");
+    await test();
+});
+
+// const loadAndPlayMIDIFile = async (url) => {
+//     const response = await fetch(url);
+//     const midiData = await response.arrayBuffer();
+//     const midiFile = new Midi(midiData);
+//
+//     // Adjust playback speed
+//     Tone.Transport.bpm.value = midiFile.header.tempos[0].bpm * 0.1;
+//
+//     const noteSet = new Set();
+//
+//     midiFile.tracks.forEach((track) => {
+//         track.notes.forEach((note) => {
+//             const noteName = midiNoteToNoteName(note.midi);
+//             if (noteName) {
+//                 noteSet.add(noteName);
+//             }
+//         });
+//     });
+//
+//     const noteLoadingPromises = Array.from(noteSet)
+//         .filter((noteName) => noteName !== null)
+//         .map(async (noteName) => {
+//             const buffer = new Tone.Buffer();
+//             await buffer.load(`notes/${noteName}.wav`);
+//             Tone.Buffer.loaded().then(() => {
+//                 bufferCache.set(noteName, buffer);
+//             });
+//         });
+//
+//     await Promise.all(noteLoadingPromises);
+//
+//     midiFile.tracks.forEach((track) => {
+//         const notes = track.notes
+//             .map((note) => {
+//                 const noteName = midiNoteToNoteName(note.midi);
+//                 return {
+//                     time: note.time,
+//                     name: noteName,
+//                     duration: note.duration + 0.28,
+//                 };
+//             })
+//             .filter((note) => note.name !== null);
+//
+//         const part = new Tone.Part((time, value) => {
+//             if (!value.name) {
+//                 console.warn("Invalid note name:", value.name);
+//                 return;
+//             }
+//
+//             const buffer = bufferCache.get(value.name);
+//             const player = new Tone.Player(buffer).toDestination();
+//             player.sync().start(time, 0, value.duration);
+//         }, notes).start(0);
+//     });
+//
+//     Tone.Transport.start();
+// };
+
 const loadAndPlayMIDIFile = async (url) => {
     const response = await fetch(url);
     const midiData = await response.arrayBuffer();
     const midiFile = new Midi(midiData);
 
     // Adjust playback speed
-    Tone.Transport.bpm.value = midiFile.header.tempos[0].bpm / 2;
+    // Tone.Transport.bpm.value = midiFile.header.tempos[0].bpm * 0.1;
 
-    const noteSet = new Set();
-
-    midiFile.tracks.forEach((track) => {
-        track.notes.forEach((note) => {
-            const noteName = midiNoteToNoteName(note.midi);
-            noteSet.add(noteName);
-        });
-    });
-
-    const noteLoadingPromises = Array.from(noteSet).map((noteName) =>
-        loadBuffer(`notes/${noteName}.wav`)
-    );
-
-    await Promise.all(noteLoadingPromises);
+    const sampler = await createSampler();
 
     midiFile.tracks.forEach((track) => {
         const notes = track.notes
@@ -165,7 +277,7 @@ const loadAndPlayMIDIFile = async (url) => {
                 return {
                     time: note.time,
                     name: noteName,
-                    duration: note.duration,
+                    duration: note.duration + 0.32,
                 };
             })
             .filter((note) => note.name !== null);
@@ -176,19 +288,17 @@ const loadAndPlayMIDIFile = async (url) => {
                 return;
             }
 
-            const player = new Tone.Player(`notes/${value.name}.wav`).toDestination();
-            player.sync().start(time, 0, value.duration);
+            sampler.triggerAttackRelease(value.name, value.duration, time);
         }, notes).start(0);
     });
 
     Tone.Transport.start();
 };
 
-
 const playMidiButton = document.getElementById("play-midi");
 
 playMidiButton.addEventListener("click", async () => {
     await Tone.start();
-    // loadAndPlayMIDIFile("midi/UNSORTED MIDI/Linkin Park - Crawling.mid");
-    loadAndPlayMIDIFile("bella_ciao.mid");
+    loadAndPlayMIDIFile("lk.mid");
+    // loadAndPlayMIDIFile("bella_ciao.mid");
 });
