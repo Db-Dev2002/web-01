@@ -1,6 +1,16 @@
 import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
 
+function createAnalyzer() {
+    const audioContext = Tone.context.rawContext;
+    const analyzer = audioContext.createAnalyser();
+    analyzer.fftSize = 2048;
+    const bufferLength = analyzer.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    return { analyzer, dataArray };
+}
+
 const midiNoteToNoteName = (midiNote) => {
     const octave = Math.floor(midiNote / 12) - 1;
     const noteNames = [
@@ -39,18 +49,32 @@ const createSampler = async () => {
     }
 
     const sampler = new Tone.Sampler(noteMap, {
-        onload: () => console.log("Sampler loaded"),
+        onload: () => {
+            console.log("Sampler loaded");
+        },
         baseUrl: "",
     }).toDestination();
 
-    return sampler;
+    const { analyzer, dataArray } = createAnalyzer();
+    sampler.connect(analyzer);
+    sampler.toDestination();
+
+    return { sampler, analyzer, dataArray };
 };
 
-let sampler;
+let sampler, analyzer, dataArray;
 const initSampler = async () => {
+    const loadingIndicator = document.getElementById("loading");
+
     if (!sampler) {
-        sampler = await createSampler();
+        const result = await createSampler();
+        sampler = result.sampler;
+        analyzer = result.analyzer;
+        dataArray = result.dataArray;
     }
+    loadingIndicator.style.display = "none";
+
+    drawEqualizer();
 };
 
 const playNote = async (note) => {
@@ -60,15 +84,63 @@ const playNote = async (note) => {
         console.warn("Invalid note name:", note);
         return;
     }
+
+    // if (!sampler.loaded) {
+    //     console.warn("Sampler not loaded yet");
+    //     return;
+    // }
+
     sampler.triggerAttackRelease(note, "8n");
+};
+
+const drawEqualizer = () => {
+    const canvas = document.getElementById("equalizer-canvas");
+    const canvasCtx = canvas.getContext("2d");
+    const bufferLength = analyzer.frequencyBinCount;
+
+    function draw() {
+        analyzer.getByteFrequencyData(dataArray);
+
+        canvasCtx.fillStyle = "rgba(30, 38, 48, 0.2)";
+        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const barWidth = (canvas.width / bufferLength) * 2.5;
+        let barHeight;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+            barHeight = dataArray[i];
+
+            canvasCtx.fillStyle = "rgb(" + barHeight * 1.1 + ", 0, 100)";
+            canvasCtx.fillRect(
+                x,
+                canvas.height - barHeight / 2,
+                barWidth,
+                barHeight / 2
+            );
+
+            x += barWidth + 1;
+        }
+
+        requestAnimationFrame(draw);
+    }
+
+    draw();
 };
 
 document.querySelectorAll(".pianoBlackKey, .pianoWhiteKey").forEach((key) => {
     key.addEventListener("mousedown", async (e) => {
+        e.preventDefault();
         const note = e.target.dataset.note;
-        await playNote(note);
+        await Tone.start();
+        await initSampler();
+        playNote(note);
     });
 });
+
+const getKeyElementForNote = (note) => {
+    return document.querySelector(`[data-note="${note}"]`);
+};
 
 const loadAndPlayMIDIFile = async (url) => {
     await initSampler();
@@ -86,7 +158,7 @@ const loadAndPlayMIDIFile = async (url) => {
                 combinedNotes.push({
                     time: note.time,
                     name: noteName,
-                    duration: note.duration + 0.08,
+                    duration: note.duration + 0.04,
                 });
             }
         });
@@ -100,6 +172,19 @@ const loadAndPlayMIDIFile = async (url) => {
             console.warn("Invalid note name:", value.name);
             return;
         }
+
+        const keyElement = getKeyElementForNote(value.name);
+        if (!keyElement) {
+            console.warn("No key element found for note:", value.name);
+            return;
+        }
+
+        keyElement.classList.add("playing");
+        setTimeout(
+            () => keyElement.classList.remove("playing"),
+            value.duration * 1000
+        );
+
         sampler.triggerAttackRelease(value.name, value.duration, time);
     }, combinedNotes).start(0);
 
