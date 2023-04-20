@@ -1,10 +1,10 @@
 import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
 
-function createAnalyzer() {
+function createAnalyzer(fftSize = 2048) {
     const audioContext = Tone.context.rawContext;
     const analyzer = audioContext.createAnalyser();
-    analyzer.fftSize = 2048;
+    analyzer.fftSize = fftSize;
     const bufferLength = analyzer.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
 
@@ -38,7 +38,20 @@ const midiNoteToNoteName = (midiNote) => {
     }
 };
 
-const createSampler = async () => {
+const playMP3 = async (url) => {
+    await initSampler(url);
+
+    if (!sampler.player || !sampler.player.loaded) {
+        console.warn("MP3 not loaded yet");
+        return;
+    }
+
+    if (!isPlaying) {
+        togglePlayPause();
+    }
+};
+
+const createSampler = async (mp3Url = null) => {
     const noteMap = {};
 
     for (let midiNote = 21; midiNote <= 108; midiNote++) {
@@ -55,26 +68,66 @@ const createSampler = async () => {
         baseUrl: "",
     }).toDestination();
 
-    const { analyzer, dataArray } = createAnalyzer();
-    sampler.connect(analyzer);
+    const { analyzer: equalizerAnalyzer, dataArray: equalizerDataArray } =
+        createAnalyzer();
+    const { analyzer: waveformAnalyzer, dataArray: waveformDataArray } =
+        createAnalyzer(4096 * 8);
+    sampler.connect(equalizerAnalyzer);
+    sampler.connect(waveformAnalyzer);
     sampler.toDestination();
 
-    return { sampler, analyzer, dataArray };
+    if (mp3Url) {
+        const buffer = await Tone.Buffer.fromUrl(mp3Url);
+        const player = new Tone.Player(buffer).toDestination();
+        player.connect(equalizerAnalyzer);
+        player.connect(waveformAnalyzer);
+        player.toDestination();
+        sampler.player = player;
+
+        return {
+            sampler,
+            equalizerAnalyzer,
+            equalizerDataArray,
+            waveformAnalyzer,
+            waveformDataArray,
+            player,
+        };
+    }
+
+    return {
+        sampler,
+        equalizerAnalyzer,
+        equalizerDataArray,
+        waveformAnalyzer,
+        waveformDataArray,
+    };
 };
 
-let sampler, analyzer, dataArray;
-const initSampler = async () => {
+let sampler,
+    equalizerAnalyzer,
+    equalizerDataArray,
+    waveformAnalyzer,
+    waveformDataArray,
+    currentMp3Url;
+const initSampler = async (mp3Url) => {
     const loadingIndicator = document.getElementById("loading");
 
-    if (!sampler) {
-        const result = await createSampler();
+    if (!sampler || (mp3Url && mp3Url !== currentMp3Url)) {
+        if (sampler) {
+            sampler.dispose();
+        }
+        const result = await createSampler(mp3Url);
         sampler = result.sampler;
-        analyzer = result.analyzer;
-        dataArray = result.dataArray;
+        equalizerAnalyzer = result.equalizerAnalyzer;
+        equalizerDataArray = result.equalizerDataArray;
+        waveformAnalyzer = result.waveformAnalyzer;
+        waveformDataArray = result.waveformDataArray;
+        currentMp3Url = mp3Url;
     }
     loadingIndicator.style.display = "none";
 
     drawEqualizer();
+    drawWaveform();
 };
 
 const playNote = async (note) => {
@@ -96,10 +149,10 @@ const playNote = async (note) => {
 const drawEqualizer = () => {
     const canvas = document.getElementById("equalizer-canvas");
     const canvasCtx = canvas.getContext("2d");
-    const bufferLength = analyzer.frequencyBinCount;
+    const bufferLength = equalizerAnalyzer.frequencyBinCount;
 
     function draw() {
-        analyzer.getByteFrequencyData(dataArray);
+        equalizerAnalyzer.getByteFrequencyData(equalizerDataArray);
 
         canvasCtx.fillStyle = "rgba(30, 38, 48, 0.2)";
         canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
@@ -109,7 +162,7 @@ const drawEqualizer = () => {
         let x = 0;
 
         for (let i = 0; i < bufferLength; i++) {
-            barHeight = dataArray[i];
+            barHeight = equalizerDataArray[i];
 
             canvasCtx.fillStyle = "rgb(" + barHeight * 1.1 + ", 0, 100)";
             canvasCtx.fillRect(
@@ -121,6 +174,53 @@ const drawEqualizer = () => {
 
             x += barWidth + 1;
         }
+
+        requestAnimationFrame(draw);
+    }
+
+    draw();
+};
+
+const drawWaveform = () => {
+    const canvas = document.getElementById("wave-canvas");
+    const canvasCtx = canvas.getContext("2d");
+
+    const container = canvas.parentNode;
+    canvas.width = container.clientWidth;
+    canvas.height = container.clientHeight;
+
+    const bufferLength = waveformAnalyzer.fftSize;
+
+    function draw() {
+        waveformAnalyzer.getByteTimeDomainData(waveformDataArray);
+
+        canvasCtx.fillStyle = "rgba(30, 38, 48, 0.2)";
+        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+        canvasCtx.lineWidth = 0;
+        canvasCtx.strokeStyle = "rgb(10, 255, 90)";
+        canvasCtx.beginPath();
+
+        const sliceWidth = (canvas.width * 1.0) / (bufferLength * 0.5);
+        let x = 0;
+
+        const yOffset = canvas.height * -0.2;
+
+        for (let i = 0; i < bufferLength; i++) {
+            const v = waveformDataArray[i] / 128.0;
+            const y = v * canvas.height * 0.75 + yOffset;
+
+            if (i === 0) {
+                canvasCtx.moveTo(x, y);
+            } else {
+                canvasCtx.lineTo(x, y);
+            }
+
+            x += sliceWidth;
+        }
+
+        canvasCtx.lineTo(canvas.width, canvas.height * 0.5 + yOffset);
+        canvasCtx.stroke();
 
         requestAnimationFrame(draw);
     }
@@ -189,15 +289,86 @@ const loadAndPlayMIDIFile = async (url) => {
     }, combinedNotes).start(0);
 
     Tone.Transport.start();
+    togglePlayPause();
 };
 
-const playMidiButton = document.getElementById("play-midi");
-
-playMidiButton.addEventListener("click", async () => {
-    await Tone.start();
-    loadAndPlayMIDIFile("lk.mid");
-    // loadAndPlayMIDIFile("lkn.mid");
-    // loadAndPlayMIDIFile("t.mid");
-    // loadAndPlayMIDIFile("bella_ciao.mid");
-    // loadAndPlayMIDIFile("dr.mid");
+document.getElementById("import-mp3").addEventListener("click", () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "audio/mp3";
+    input.onchange = (event) => {
+        const file = event.target.files[0];
+        const url = URL.createObjectURL(file);
+        playMP3(url);
+    };
+    input.click();
 });
+
+document.getElementById("import-midi").addEventListener("click", () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".mid";
+    input.onchange = async (event) => {
+        const file = event.target.files[0];
+        const url = URL.createObjectURL(file);
+        loadAndPlayMIDIFile(url);
+    };
+    input.click();
+});
+
+document.getElementById("play-pause").addEventListener("click", () => {
+    togglePlayPause();
+});
+
+let isPlaying = false;
+
+let currentPlaybackTime = 0;
+const togglePlayPause = () => {
+    if (!sampler) {
+        console.warn("Sampler not initialized.");
+        return;
+    }
+
+    isPlaying = !isPlaying;
+
+    if (isPlaying) {
+        if (sampler.player && sampler.player.loaded) {
+            sampler.player.start(Tone.now(), currentPlaybackTime);
+        } else {
+            Tone.Transport.start();
+        }
+        document.getElementById("play-pause").innerHTML = "&#10074;&#10074;";
+    } else {
+        if (sampler.player && sampler.player.loaded) {
+            currentPlaybackTime = sampler.player.toSeconds(
+                sampler.player.buffer.duration * sampler.player.progress
+            );
+            sampler.player.pause();
+        } else {
+            Tone.Transport.pause();
+        }
+        document.getElementById("play-pause").innerHTML = "&#9658;";
+    }
+};
+
+// const playMidiButton = document.getElementById("play-midi");
+
+// playMidiButton.addEventListener("click", async () => {
+// const mp3Url = "s.mp3";
+// playMP3("s.mp3");
+// await Tone.start();
+// loadAndPlayMIDIFile("i_giorni.mid");
+// loadAndPlayMIDIFile("lk.mid");
+// loadAndPlayMIDIFile("mirrors.mid");
+// loadAndPlayMIDIFile("halo.mid");
+// loadAndPlayMIDIFile("dps.mid");
+// loadAndPlayMIDIFile("skyfall.mid");
+// loadAndPlayMIDIFile("bond.mid");
+// loadAndPlayMIDIFile("qqq.mid");
+// loadAndPlayMIDIFile("qqq.mid");
+// loadAndPlayMIDIFile("lkn.mid");
+// loadAndPlayMIDIFile("t.mid");
+// loadAndPlayMIDIFile("bella_ciao.mid");
+// loadAndPlayMIDIFile("candy.mid");
+// loadAndPlayMIDIFile("dr.mid");
+// });

@@ -30,11 +30,13 @@ footer {
 }
 
 button {
-  margin: 8px;
-  background-color: var(--color-highlight);
+  font-size: 12px;
+  margin: 4px;
+  color: var(--color-Blue);
+  background-color: var(--color-gray-04);
   border-radius: 20px;
-  border-color: var(--color-highlight);
-  padding: 6px 6px 6px 6px;
+  border-color: var(--color-gray-01);
+  padding: 3px 3px 3px 3px;
 }
 
 .lat {
@@ -184,6 +186,9 @@ button {
 }
 
 #wave-canvas {
+  /* width: 100%; */
+  /* height: 100%; */
+
   flex: 1;
 }
 
