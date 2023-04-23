@@ -1,6 +1,14 @@
 import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
 
+/**
+ * Creates an analyzer for audio visualization.
+ *
+ * @param {number} [fftSize=2048] - The size of the Fast Fourier Transform
+ * (FFT) to be used.
+ * @returns {Object} - An object containing the analyzer and the data array
+ * for visualization.
+ */
 function createAnalyzer(fftSize = 2048) {
     const audioContext = Tone.context.rawContext;
     const analyzer = audioContext.createAnalyser();
@@ -11,6 +19,13 @@ function createAnalyzer(fftSize = 2048) {
     return { analyzer, dataArray };
 }
 
+/**
+ * Converts a MIDI note number to a note name with octave.
+ *
+ * @param {number} midiNote - The MIDI note number.
+ * @returns {string|null} - The note name with octave, or null if the MIDI
+ * note number is invalid.
+ */
 const midiNoteToNoteName = (midiNote) => {
     const octave = Math.floor(midiNote / 12) - 1;
     const noteNames = [
@@ -38,6 +53,11 @@ const midiNoteToNoteName = (midiNote) => {
     }
 };
 
+/**
+ * Plays an MP3 file from a given URL.
+ *
+ * @param {string} url - The URL of the MP3 file.
+ */
 const playMP3 = async (url) => {
     await initSampler(url);
 
@@ -51,6 +71,13 @@ const playMP3 = async (url) => {
     }
 };
 
+/**
+ * Creates a sampler with audio files and a player if an MP3 URL is provided.
+ *
+ * @param {string|null} [mp3Url=null] - The URL of the MP3 file to load into the player.
+ * @returns {Promise<Object>} - A promise that resolves to an object containing the sampler,
+ * analyzers, data arrays, and the player (if mp3Url is provided).
+ */
 const createSampler = async (mp3Url = null) => {
     const noteMap = {};
 
@@ -71,7 +98,7 @@ const createSampler = async (mp3Url = null) => {
     const { analyzer: equalizerAnalyzer, dataArray: equalizerDataArray } =
         createAnalyzer();
     const { analyzer: waveformAnalyzer, dataArray: waveformDataArray } =
-        createAnalyzer(4096 * 8);
+        createAnalyzer(4096 * 2);
     sampler.connect(equalizerAnalyzer);
     sampler.connect(waveformAnalyzer);
     sampler.toDestination();
@@ -109,6 +136,11 @@ let sampler,
     waveformAnalyzer,
     waveformDataArray,
     currentMp3Url;
+/**
+ * Initializes the sampler and audio visualization.
+ *
+ * @param {string} [mp3Url] - The URL of the MP3 file to be loaded into the player.
+ */
 const initSampler = async (mp3Url) => {
     const loadingIndicator = document.getElementById("loading");
 
@@ -130,6 +162,11 @@ const initSampler = async (mp3Url) => {
     drawWaveform();
 };
 
+/**
+ * Plays a note using the sampler.
+ *
+ * @param {string} note - The note name with octave to be played.
+ */
 const playNote = async (note) => {
     await initSampler();
 
@@ -146,6 +183,9 @@ const playNote = async (note) => {
     sampler.triggerAttackRelease(note, "8n");
 };
 
+/**
+ * Draws the equalizer visualization.
+ */
 const drawEqualizer = () => {
     const canvas = document.getElementById("equalizer-canvas");
     const canvasCtx = canvas.getContext("2d");
@@ -154,7 +194,8 @@ const drawEqualizer = () => {
     function draw() {
         equalizerAnalyzer.getByteFrequencyData(equalizerDataArray);
 
-        canvasCtx.fillStyle = "rgba(30, 38, 48, 0.2)";
+        // canvasCtx.fillStyle = "rgba(30, 38, 48, 0.2)";
+        canvasCtx.fillStyle = "rgba(43, 52, 60)";
         canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
         const barWidth = (canvas.width / bufferLength) * 2.5;
@@ -181,6 +222,9 @@ const drawEqualizer = () => {
     draw();
 };
 
+/**
+ * Draws the waveform visualization.
+ */
 const drawWaveform = () => {
     const canvas = document.getElementById("wave-canvas");
     const canvasCtx = canvas.getContext("2d");
@@ -194,7 +238,7 @@ const drawWaveform = () => {
     function draw() {
         waveformAnalyzer.getByteTimeDomainData(waveformDataArray);
 
-        canvasCtx.fillStyle = "rgba(30, 38, 48, 0.2)";
+        canvasCtx.fillStyle = "rgba(56, 65, 74)";
         canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
         canvasCtx.lineWidth = 0;
@@ -228,6 +272,9 @@ const drawWaveform = () => {
     draw();
 };
 
+/**
+ * Attaches mousedown event listeners to piano key elements for playing notes.
+ */
 document.querySelectorAll(".pianoBlackKey, .pianoWhiteKey").forEach((key) => {
     key.addEventListener("mousedown", async (e) => {
         e.preventDefault();
@@ -238,10 +285,22 @@ document.querySelectorAll(".pianoBlackKey, .pianoWhiteKey").forEach((key) => {
     });
 });
 
+/**
+ * Returns the key element corresponding to a note.
+ *
+ * @param {string} note - The note name with octave.
+ * @returns {HTMLElement|null} - The key element corresponding to the note,
+ * or null if not found.
+ */
 const getKeyElementForNote = (note) => {
     return document.querySelector(`[data-note="${note}"]`);
 };
 
+/**
+ * Loads and plays a MIDI file from a given URL.
+ *
+ * @param {string} url - The URL of the MIDI file.
+ */
 const loadAndPlayMIDIFile = async (url) => {
     await initSampler();
 
@@ -292,6 +351,9 @@ const loadAndPlayMIDIFile = async (url) => {
     togglePlayPause();
 };
 
+/**
+ * Handles importing MP3 files, auto play enabled.
+ */
 document.getElementById("import-mp3").addEventListener("click", () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -304,6 +366,9 @@ document.getElementById("import-mp3").addEventListener("click", () => {
     input.click();
 });
 
+/**
+ * Handles importing MIDI files, auto play enabled.
+ */
 document.getElementById("import-midi").addEventListener("click", () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -316,13 +381,26 @@ document.getElementById("import-midi").addEventListener("click", () => {
     input.click();
 });
 
+/**
+ * Handles play/pause button clicks.
+ */
 document.getElementById("play-pause").addEventListener("click", () => {
     togglePlayPause();
 });
 
+/**
+ * Bool to indicate whether the audio is playing or not.
+ */
 let isPlaying = false;
 
+/**
+ * Stores the current playback time of the audio.
+ */
 let currentPlaybackTime = 0;
+
+/**
+ * Toggles play/pause state of the audio.
+ */
 const togglePlayPause = () => {
     if (!sampler) {
         console.warn("Sampler not initialized.");
@@ -350,25 +428,3 @@ const togglePlayPause = () => {
         document.getElementById("play-pause").innerHTML = "&#9658;";
     }
 };
-
-// const playMidiButton = document.getElementById("play-midi");
-
-// playMidiButton.addEventListener("click", async () => {
-// const mp3Url = "s.mp3";
-// playMP3("s.mp3");
-// await Tone.start();
-// loadAndPlayMIDIFile("i_giorni.mid");
-// loadAndPlayMIDIFile("lk.mid");
-// loadAndPlayMIDIFile("mirrors.mid");
-// loadAndPlayMIDIFile("halo.mid");
-// loadAndPlayMIDIFile("dps.mid");
-// loadAndPlayMIDIFile("skyfall.mid");
-// loadAndPlayMIDIFile("bond.mid");
-// loadAndPlayMIDIFile("qqq.mid");
-// loadAndPlayMIDIFile("qqq.mid");
-// loadAndPlayMIDIFile("lkn.mid");
-// loadAndPlayMIDIFile("t.mid");
-// loadAndPlayMIDIFile("bella_ciao.mid");
-// loadAndPlayMIDIFile("candy.mid");
-// loadAndPlayMIDIFile("dr.mid");
-// });
